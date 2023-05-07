@@ -1,7 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,20 +29,55 @@ namespace BallSortSolver
             var next = board.GetNextBoards();
             Assert.AreEqual(2, next.Count);
 
-            board = Board.CreateFromFile("C:\\users\\mikeg\\Desktop\\board_069.txt");
-            SolveBoard(board);
+            var resourcePath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Resources");
+            var files = Directory.EnumerateFiles(resourcePath, "board_*.txt", SearchOption.TopDirectoryOnly);
+
+            foreach(var file in files)
+            {
+                board = Board.CreateFromFile(file);
+                var solution = SolveBoard(board);
+
+                using (var stream = new StreamWriter($"solution_{Path.GetFileName(file)}"))
+                {
+                    var index = 0;
+
+                    if (solution.Count == 0)
+                    {
+                        stream.WriteLine("No solution found.");
+                    }
+
+                    foreach (var move in solution)
+                    {
+                        move.PrintBoard($"Move {index}/{solution.Count}");
+                        move.PrintBoard(stream, $"Move {index}/{solution.Count}");
+                        index++;
+                    }
+                }
+            }
         }
 
-        static void SolveBoard(Board board)
+        static List<Board> SolveBoard(Board board)
         {
             var solver = new Solver();
+            var solution = new List<Board>();
             var ret = solver.FindSolution(board);
-            Console.WriteLine($"Solved = {ret}");
+
+            if (ret == null)
+            {
+                Console.WriteLine($"No solution!!! Visited = {solver.Visited.Count}");
+                return solution;
+            }
+
+            Console.WriteLine($"Solved!!! Visited = {solver.Visited.Count}");
+            // boards are in "reverse order" at this point (walking up looking at parents).
+            // make understanding the moves easier now by reversing the order.
             while (ret != null)
             {
-                ret.PrintBoard("parent");
+                solution.Insert(0, ret);
                 ret = ret.Parent;
             }
+            
+            return solution;
         }
     }
 }

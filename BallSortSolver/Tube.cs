@@ -77,6 +77,16 @@ namespace BallSortSolver
             return base.GetHashCode();
         }
 
+        public string GetBallString(int index)
+        {
+            if (index < this.Balls.Count)
+            {
+                return this.Balls[index].ToString();
+            }
+
+            return ".";
+        }
+
         public override string ToString()
         {
             var result = new StringBuilder();

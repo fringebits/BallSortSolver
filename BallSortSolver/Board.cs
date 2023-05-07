@@ -133,15 +133,32 @@ namespace BallSortSolver
             return result;
         }
 
-        public void PrintBoard(string desc)
+        public override string ToString()
         {
             var tubes = new List<Tube>(this.Tubes);
             tubes.Sort((x, y) => x.Id - y.Id);
-            Console.WriteLine($"--- {desc} ---");
-            foreach(var tube in tubes)
+            var result = new StringBuilder();
+            for(var ii=MaxBallsPerTube-1; ii >= 0; ii--)
             {
-                Console.WriteLine($"{tube.Id:2} {tube}");
-            }
+                foreach(var tube in tubes)
+                {
+                    result.Append($"{tube.GetBallString(ii)}  ");
+                }
+                result.AppendLine();
+            }            
+
+            return result.ToString();
+        }
+
+        public void PrintBoard(string desc)
+        {
+            PrintBoard(Console.Out, desc);
+        }
+
+        public void PrintBoard(TextWriter stream, string desc)
+        {
+            stream.WriteLine($"--- {desc} ---");
+            stream.WriteLine(this.ToString());
         }
 
         public override bool Equals(object obj)

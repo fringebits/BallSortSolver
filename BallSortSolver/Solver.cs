@@ -36,7 +36,7 @@ namespace BallSortSolver
                 //origin.PrintBoard($"Current Board, Open={open.Count}");
 
                 var children = board.GetNextBoards();
-                Console.WriteLine($"Found {children.Count} moves.");
+                //Console.WriteLine($"Found {children.Count} moves.");
 
                 //var index = 0;
                 foreach(var child in children)
@@ -47,6 +47,8 @@ namespace BallSortSolver
                         // we've already seen this board
                         continue;
                     }
+
+                    this.Visited.Add(child);
 
                     if (child.IsWinner)
                     {
