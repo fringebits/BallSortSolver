@@ -9,6 +9,58 @@ using System.Threading.Tasks;
 
 namespace BallSortSolver
 {
+    internal class Levels
+    {
+        private Dictionary<string, char> ColorMap = new Dictionary<string, char>()
+        {
+            { "0", 'r' }, // red
+            { "1", 'b' }, // blue
+            { "2", 'w' }, // brown
+            { "3", 'y' }, // yellow
+            { "4", 'o' }, // orange
+            { "5", 'p' }, // purple
+            { "6", 'k' }, // pink
+            { "7", 'l' }, // light-blue
+            { "8", 'd' }, // dark-green
+            { "9", 'e' }, // grey
+            {"10", 'g' }, // green
+            {"11", 'a' }, // aqua
+        };
+
+        public Levels(string filename)
+        {
+            this.Boards = new List<Board>();
+            this.LoadBoards(filename);
+        }
+
+        public List<Board> Boards { get; }
+
+        private void LoadBoards(string filename)
+        {
+            var levels = File.ReadAllText(filename);
+            foreach(var level in levels.Split('-'))
+            {
+                var board = new Board(14, 4, 12);
+                var tubeIndex = 0;
+                foreach(var tubeString in level.Split(':'))
+                {
+                    var tube = new StringBuilder();
+                    foreach(var color in tubeString.Split(','))
+                    {
+                        var value = color.Trim('\r', '\n');
+                        tube.Append(ColorMap[value]);
+                    }
+
+                    board.SetTube(tubeIndex, new Tube(board, tubeIndex, new string(tube.ToString().Reverse().ToArray())));
+                    tubeIndex++;
+                }
+
+                this.Boards.Add(board);
+            }
+        }
+    };
+
+
     class Program
     {
         static void Main(string[] args)
@@ -54,6 +106,42 @@ namespace BallSortSolver
                     }
                 }
             }
+
+            var levelFile = Path.Combine(resourcePath, "levels.txt");
+            using (var stream = new StreamWriter($"solution_{Path.GetFileName(levelFile)}"))
+            {
+                var levels = new Levels(levelFile);
+
+                var levelIndex = 1;
+                foreach(var level in levels.Boards)
+                {
+                    var solution = SolveBoard(level);
+
+                    if (solution.Count == 0)
+                    {
+                        Console.WriteLine($"Level {levelIndex}: No Solution");
+                        stream.WriteLine($"Level {levelIndex}: No Solution");
+                    }
+                    else
+                    { 
+                        Console.WriteLine($"Level {levelIndex}: Solved in {solution.Count} moves");
+                        stream.WriteLine($"Level {levelIndex}: Solved in {solution.Count} moves");
+
+                        var index = 0;
+                        foreach (var move in solution)
+                        {
+                            if (move.Move != null)
+                            {
+                                move.Move.PrintMove(stream, $"\t{index,3}.  ");
+                                move.PrintBoard(stream, null);
+                            }
+                            index++;
+                        }
+                    }
+
+                    levelIndex++;
+                }
+            }
         }
 
         static List<Board> SolveBoard(Board board)
@@ -64,11 +152,11 @@ namespace BallSortSolver
 
             if (ret == null)
             {
-                Console.WriteLine($"No solution!!! Visited = {solver.Visited.Count}");
+                //Console.WriteLine($"No solution!!! Visited = {solver.Visited.Count}");
                 return solution;
             }
 
-            Console.WriteLine($"Solved!!! Visited = {solver.Visited.Count}");
+            //Console.WriteLine($"Solved!!! Visited = {solver.Visited.Count}");
             // boards are in "reverse order" at this point (walking up looking at parents).
             // make understanding the moves easier now by reversing the order.
             while (ret != null)

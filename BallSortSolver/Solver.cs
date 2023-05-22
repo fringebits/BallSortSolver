@@ -52,7 +52,7 @@ namespace BallSortSolver
 
                     if (child.IsWinner)
                     {
-                        child.PrintBoard("Winner!!!");
+                        //child.PrintBoard("Winner!!!");
                         return child;
                     }
 

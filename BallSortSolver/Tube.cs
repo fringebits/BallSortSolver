@@ -17,6 +17,7 @@ namespace BallSortSolver
             this.Id = id;
         }
 
+        // balls are ordered BOTTOM to TOP
         public Tube(Board board, int id, string balls)
             : this(board, id)
         {

@@ -70,6 +70,10 @@ namespace BallSortSolver
         [JsonIgnore] 
         public Board Parent { get; set; }
 
+        // This is the move that takes us from Parent to This.
+        [JsonIgnore]
+        public Move Move { get; set; }
+
         public int MaxBallsPerTube { get; set; }
 
         [JsonIgnore]
@@ -124,6 +128,8 @@ namespace BallSortSolver
                         if (!result.Contains(board))
                         {
                             board.Parent = this;
+                            // ii -> kk
+                            board.Move = new Move(this.Tubes[ii].Id, this.Tubes[kk].Id);
                             result.Add(board);
                         }
                     }
@@ -157,7 +163,10 @@ namespace BallSortSolver
 
         public void PrintBoard(TextWriter stream, string desc)
         {
-            stream.WriteLine($"--- {desc} ---");
+            if (!string.IsNullOrEmpty(desc))
+            {
+                stream.WriteLine($"--- {desc} ---");
+            }
             stream.WriteLine(this.ToString());
         }
 
